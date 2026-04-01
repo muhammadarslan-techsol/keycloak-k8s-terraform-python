@@ -90,9 +90,7 @@ Import-Certificate -FilePath "<your-clone-path>\certs\tls.crt" -CertStoreLocatio
 
 ## Notes
 
-- Local dev setup only.
 - Add `keycloak.localhost` to your hosts file before deploying.
-- Docker needs at least 4 GB RAM allocated.
 - Traefik is disabled in k3d; NGINX Ingress handles TLS.
 - Keycloak runs in `start-dev` mode using `quay.io/keycloak/keycloak:26.0`.
 - PostgreSQL uses `emptyDir` — data is lost on pod restart.
