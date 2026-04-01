@@ -88,10 +88,11 @@ def deploy():
 def destroy():
     cert = os.path.join(CERT_DIR, "tls.crt")
     key = os.path.join(CERT_DIR, "tls.key")
+    user, password = get_credentials()
     try:
         kubeconfig = get_kubeconfig_path()
         tf.init()
-        tf.destroy(kubeconfig, cert, key)
+        tf.destroy(kubeconfig, cert, key, user, password, DOMAIN)
     except Exception as e:
         print(f"[warn] Terraform destroy failed: {e}")
     delete_cluster()
@@ -105,11 +106,14 @@ def status():
         print(f"  Cluster '{CLUSTER_NAME}': NOT FOUND")
         return
 
+    kubeconfig = get_kubeconfig_path()
+    env = {**os.environ, "KUBECONFIG": kubeconfig}
+
     for resource in ["pods", "ingress"]:
         try:
             r = subprocess.run(
                 ["kubectl", "get", resource, "-n", "keycloak", "--no-headers"],
-                capture_output=True, text=True, check=True,
+                capture_output=True, text=True, check=True, env=env,
             )
             print(f"\n  {resource}:\n{r.stdout}")
         except subprocess.CalledProcessError:
